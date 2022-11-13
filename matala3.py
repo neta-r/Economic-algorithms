@@ -6,12 +6,10 @@ class party:
     def __init__(self, name, votes, mandates=0):
         self.name = name
         self.votes = votes
+        self.copy = votes
         self.mandates = mandates
 
 
-real_parties = [['מחל', 1115336, 32], ['פה', 847435, 24], ['ט', 516470, 14],
-                ['כן', 432482, 12], ['שס', 392964, 11], ['ג', 280194, 7], ['ל', 213687, 6],
-                ['עם', 194047, 5], ['ום', 178735, 5], ['אמת', 175992, 4]]
 parties = [party('מחל', 1115336), party('פה', 847435), party('ט', 516470), party('כן', 432482),
            party('שס', 392964), party('ג', 280194), party('ל', 213687), party('עם', 194047),
            party('ום', 178735), party('אמת', 175992)]
@@ -23,7 +21,7 @@ def __divider_system__(parities: list[party], f: functools, seats: int):
         max_remainder = 0
         max_party = None
         for p in parities:
-            curr_remainder = p.votes / f(p.mandates)
+            curr_remainder = p.copy / f(p.mandates)
             if curr_remainder > max_remainder:
                 max_remainder = curr_remainder
                 max_party = p
@@ -32,22 +30,17 @@ def __divider_system__(parities: list[party], f: functools, seats: int):
     return parities
 
 
-def __print_mandates__(parities: list[party]):
-    for p in parities:
-        print(p.name + " got " + str(p.mandates) + " mandates")
-
-
 def Webster(x): return x + 0.5
 
 
 def Jefferson(x): return x + 1
 
 
-def show_diff():
+def show_diff(real_parties: list[party], parties: list[party]):
     print("Real results:")
-    real_parties.insert(0, headers)
-    print(tabulate(real_parties, headers='firstrow', tablefmt='fancy_grid'))
-    real_parties.pop(0)
+    real_table = [[p.name, p.votes, p.mandates] for p in real_parties]
+    real_table.insert(0, headers)
+    print(tabulate(real_table, headers='firstrow', tablefmt='fancy_grid'))
     print('\n\n')
     webster_parities = (__divider_system__(parties, Webster, 120))
     table = [[p.name, p.votes, p.mandates] for p in webster_parities]
@@ -58,11 +51,12 @@ def show_diff():
 
 def reset_mandates():
     for p in parties: p.mandates = 0
+    for p in parties: p.copy = p.votes
 
 
 def is_the_same(curr_parties: list[party]):
-    for j in range(0, len(real_parties) - 1):
-        if real_parties[j][2] != curr_parties[j].mandates:
+    for j in range(0, len(parties) - 1):
+        if real_parties[j].mandates != curr_parties[j].mandates:
             return False
     return True
 
@@ -83,19 +77,28 @@ def check_y():
             return
 
 
+def __print_mandates__(parities: list[party]):
+    for p in parities:
+        print(p.name + " got " + str(p.mandates) + " mandates")
+
+
 if __name__ == '__main__':
-    # # class examples
-    # parities = [party('A', 160), party('B', 340)]
-    # print("Class first example")
-    # __print_mandates__(__divider_system__(parities, Jefferson, 5))
-    #
-    # parities = [party('A', 40), party('B', 135), party('C', 325)]
-    # print("\n\nClass second example")
-    # __print_mandates__(__divider_system__(parities, Jefferson, 5))
+    # class examples
+    parities = [party('A', 160), party('B', 340)]
+    print("Class first example")
+    __print_mandates__(__divider_system__(parities, Jefferson, 5))
+
+    parities = [party('A', 40), party('B', 135), party('C', 325)]
+    print("\n\nClass second example")
+    __print_mandates__(__divider_system__(parities, Jefferson, 5))
 
     # exercise
+    real_parties = [party('מחל', 1115336), party('פה', 847435), party('ט', 516470), party('כן', 432482),
+                    party('שס', 392964), party('ג', 280194), party('ל', 213687), party('עם', 194047),
+                    party('ום', 178735), party('אמת', 175992)]
+    real_parties = (__divider_system__(real_parties, Jefferson, 120))
     print("\n\nPart A:")
-    show_diff()
+    show_diff(real_parties, parties)
 
     print("\n\nPart B:")
     check_y()
