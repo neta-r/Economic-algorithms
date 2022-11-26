@@ -1,3 +1,4 @@
+import cvxpy as cp
 
 
 def sort_object_according_to_ratio(a: list[float], b: list[float], ratio: list[float]):
@@ -47,6 +48,12 @@ def manipulate(other_players_values: list[float], our_real_vals: list[float]):
     if len(other_players_values) != len(our_real_vals):
         return None
     fake_vals = [0] * len(our_real_vals)
+    objVal = cp.Variable(len(our_real_vals))
+    y = range(1, len(our_real_vals) + 1)
+    constraints = []
+
+    for i in range(len(our_real_vals)):
+        constraints += [objVal > 0]
     return fake_vals
 
 
@@ -57,3 +64,4 @@ if __name__ == '__main__':
     print(calc_real_bin_val(Ivana, realDivIvana))
     fakeDivDonald, fakeDivIvana, Donald, Ivana = adjusted_winner(Donald, [44, 25, 30, 1])
     print(calc_real_bin_val(Ivana, fakeDivIvana))
+    manipulate([15, 15, 40, 30], [40, 25, 30, 5])
